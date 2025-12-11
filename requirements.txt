@@ -1,6 +1,4 @@
 streamlit
 openai
 python-dotenv
-pyaudio
-websockets
-aiohttp
+audio-recorder-streamlit
