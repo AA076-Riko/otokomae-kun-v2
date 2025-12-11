@@ -1,19 +1,19 @@
 # 🎤 OTOKO★MAE くん＆OTO♡ME ちゃん
 
-OpenAI Realtime API を使用した**リアルタイム会議ファシリテーター**です。会議音声をリアルタイムで文字起こしし、AI が自動でツッコミ・要約を生成します。
+**Streamlit + カスタムコンポーネント**で実現する、リアルタイム AI 会議ファシリテーターです。ブラウザで録音し、指定時間ごとに自動で文字起こし・ツッコミ・要約を生成します。
 
-## 機能
+## ✨ 特徴
 
-- リアルタイム音声認識（OpenAI Realtime API）
-- AI による自動ツッコミ生成（2 分間隔）
-- 2 つのキャラクターモード
-  - **OTOKO☆MAE くんモード**：関西弁でテンポよくツッコミ 🔥
-  - **OTO♡ME ちゃんモード**：優しく丁寧なサポート 🐰
-- 会議要約の自動生成
-- 会議時間の自動計測
-- 文字起こし・要約のダウンロード機能
+- **ブラウザ録音**: MediaRecorder API を使用したシンプルな録音
+- **自動チャンク送信**: 30〜180 秒ごとに音声を自動送信・処理
+- **リアルタイム文字起こし**: OpenAI Whisper API で即座に文字起こし
+- **AI ツッコミ**: 会議の進行を AI がサポート
+  - **OTOKO☆MAE くんモード**: 関西弁でテンポよくツッコミ 🔥
+  - **OTO♡ME ちゃんモード**: 優しく丁寧なサポート 🐰
+- **会議要約**: 会議全体の要約を自動生成
+- **Streamlit のみで完結**: 追加のサーバー不要、デプロイが簡単！
 
-## セットアップ
+## 🚀 セットアップ
 
 ### 1. 必要なパッケージのインストール
 
@@ -38,22 +38,22 @@ set OPENAI_API_KEY=your_api_key_here
 export OPENAI_API_KEY=your_api_key_here
 ```
 
-または `.streamlit/secrets.toml` ファイルを編集：
+または `.env` ファイルを作成：
 
-```toml
-OPENAI_API_KEY = "your_api_key_here"
+```
+OPENAI_API_KEY=your_api_key_here
 ```
 
 #### Streamlit Cloud の場合
 
 Streamlit Cloud のダッシュボードで Secrets に `OPENAI_API_KEY` を設定してください。
 
-## 使い方
+## 💻 使い方
 
 ### アプリの起動
 
 ```bash
-streamlit run app_realtime.py
+streamlit run app.py
 ```
 
 ブラウザが自動的に開き、アプリが表示されます（通常は `http://localhost:8501`）。
@@ -61,40 +61,66 @@ streamlit run app_realtime.py
 ### 会議のファシリテート
 
 1. **サイドバーでキャラクター選択**（OTOKO☆MAE くん / OTO♡ME ちゃん）
-2. **🎙️ 録音開始ボタン**を押す
-3. **今日の議題を宣言**してから会話を開始
-4. AI が自動で：
-   - リアルタイムに文字起こし
-   - 2 分ごとにツッコミを生成
-   - 必要に応じて会議要約を作成
-5. **⏹️ 録音停止ボタン**で終了
+2. **チャンク長を設定**（30〜180 秒、デフォルト 60 秒）
+3. **🎤 録音開始ボタン**を押す
+4. **今日の議題を宣言**してから会話を開始
+5. AI が自動で：
+   - 設定した時間ごとに文字起こし
+   - チャンクごとにツッコミを生成
+   - 会議全体を記録
+6. **⏹️ 録音停止ボタン**で終了
+7. **📊 要約を生成ボタン**で会議全体の要約を作成
 
-## 必要な環境
+## 📁 プロジェクト構造
+
+```
+otokomae-kun-1/
+├── app.py                          # メインアプリケーション
+├── requirements.txt                # Python依存関係（streamlit, openai, python-dotenv）
+├── components/
+│   └── audio_recorder/             # カスタム録音コンポーネント
+│       ├── __init__.py             # Pythonインターフェース
+│       └── frontend/
+│           └── index.html          # ブラウザ録音UI（MediaRecorder API）
+├── prompts/
+│   ├── otokомae_prompt.txt         # OTOKO★MAEくんプロンプト
+│   ├── tsukkomi_prompt.txt         # OTO♡MEちゃんプロンプト
+│   └── summary_prompt.txt          # 要約生成プロンプト
+└── image/                          # 画像素材
+```
+
+## 🌐 Streamlit Cloud でのデプロイ
+
+1. GitHub リポジトリを Streamlit Cloud に接続
+2. メインファイルパスを `app.py` に設定
+3. Secrets に `OPENAI_API_KEY` を追加
+4. デプロイ完了！
+
+## 🛠️ 必要な環境
 
 - Python 3.8 以上
 - OpenAI API キー（[OpenAI Platform](https://platform.openai.com/)で取得）
-  - Realtime API へのアクセス権が必要
+  - Whisper API と GPT-4 へのアクセス
 - インターネット接続
 - マイク（音声入力用）
+- モダンブラウザ（Chrome, Firefox, Edge 等）
 
-## トラブルシューティング
+## ❓ トラブルシューティング
 
 ### API キーエラーが表示される場合
 
 - 環境変数 `OPENAI_API_KEY` が正しく設定されているか確認
 - `.env` ファイルに API キーが設定されているか確認
-- Realtime API へのアクセス権があるか確認
 
 ### 録音ができない場合
 
-- マイクが正しく接続されているか確認
-- OS のマイク権限設定を確認
-- PyAudio が正しくインストールされているか確認
+- ブラウザのマイク権限を確認
+- HTTPS または localhost で実行されているか確認（MediaRecorder API の要件）
 
 ### 文字起こしが表示されない場合
 
 - インターネット接続を確認
-- ターミナルのログでエラーメッセージを確認
+- ブラウザの開発者コンソールでエラーメッセージを確認
 - マイクの音量が適切か確認
 
 ## ライセンス
